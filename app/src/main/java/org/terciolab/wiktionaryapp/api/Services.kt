@@ -28,7 +28,15 @@ data class WordMeaning(
     val senses: List<Sense>,
     val pos: String,
     val word: String,
-    val lang: String
+    val lang: String,
+    val etymology_text: String?,
+    val sounds: List<Sound>?
+)
+
+@JsonClass(generateAdapter = true)
+data class Sound(
+    val ipa: String?,
+    val tags: List<String>?,
 )
 
 interface WikiService {
@@ -38,7 +46,12 @@ interface WikiService {
 
 interface KaikkiService {
     @Streaming
-    @GET("All%20languages%20combined/meaning/{firstOne}/{firstTwo}/{whole}.jsonl")
-    suspend fun getWordMeanings(@Path("firstOne") firstOne: String, @Path("firstTwo") firstTwo: String, @Path("whole") whole: String): List<WordMeaning>
+    @GET("{langDictionary}/All%20languages%20combined/meaning/{firstOne}/{firstTwo}/{whole}.jsonl")
+    suspend fun getWordMeanings(
+        @Path("firstOne") firstOne: String,
+        @Path("firstTwo") firstTwo: String,
+        @Path("whole") whole: String,
+        @Path("langDictionary") langDictionary: String = ""
+    ): List<WordMeaning>
 }
 

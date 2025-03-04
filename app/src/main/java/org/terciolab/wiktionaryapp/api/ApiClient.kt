@@ -9,8 +9,8 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 object ApiClient {
 
-    private const val WIKTIONARY_SEARCH_URL = "https://en.wiktionary.org/w/rest.php/v1/"
-    private const val KAIKII_URL = "https://kaikki.org/dictionary/"
+    private const val WIKTIONARY_SEARCH_URL = "https://%s.wiktionary.org/w/rest.php/v1/"
+    private const val KAIKII_URL = "https://kaikki.org/"
 
     private val moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
@@ -28,13 +28,19 @@ object ApiClient {
             .build()
     }
 
-    val wiki : WikiService by lazy {
-        Retrofit.Builder()
-            .client(client)
-            .baseUrl(WIKTIONARY_SEARCH_URL)
-            .addConverterFactory(MoshiConverterFactory.create())
-            .build()
-            .create(WikiService::class.java)
+    private var wiki : WikiService? = null
+
+    fun getWiki(lang: String): WikiService {
+        if (wiki == null) {
+
+            wiki = Retrofit.Builder()
+                .client(client)
+                .baseUrl(String.format(WIKTIONARY_SEARCH_URL,lang))
+                .addConverterFactory(MoshiConverterFactory.create())
+                .build()
+                .create(WikiService::class.java)
+        }
+        return wiki!!
     }
 
     val kaikki : KaikkiService by lazy {
